@@ -1,0 +1,63 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-13}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-airflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
+      POSTGRES_DB: ${POSTGRES_DB:-airflow}
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    networks:
+      - airflow
+
+  webserver:
+    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2.004}
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-}
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@${POSTGRES_HOST:-postgres}/${POSTGRES_DB:-airflow}
+      AIRFLOW__WEBSERVER__BASE_URL: ${HOST_PROTOCOL:-http}://${HOST_NAME:-localhost:8080}
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY:-}
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/plugins:/opt/airflow/plugins
+    networks:
+      - airflow
+    depends_on:
+      - postgres
+
+  scheduler:
+    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2.004}
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-}
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@${POSTGRES_HOST:-postgres}/${POSTGRES_DB:-airflow}
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/plugins:/opt/airflow/plugins
+    networks:
+      - airflow
+    depends_on:
+      - webserver
+
+  worker:
+    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2.004}
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-}
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@${POSTGRES_HOST:-postgres}/${POSTGRES_DB:-airflow}
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/plugins:/opt/airflow/plugins
+    networks:
+      - airflow
+    depends_on:
+      - webserver
+      - scheduler
+
+volumes:
+  postgres-db:
+
+networks:
+  airflow:
