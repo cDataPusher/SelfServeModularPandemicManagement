@@ -4,20 +4,14 @@ This repository contains a setup for testing Apache Superset with Docker Compose
 
 ##Getting Started
 
-1. Clone this repository:
-
+1. Navigate to the repository directory:
 ```bash
-git clone <repository_url>
+cd superset
 ```
 
-2. Navigate to the repository directory:
+2. Start the services:
 ```bash
-cd <repository_directory>
-```
-
-3. Start the services:
-```bash
-docker-compose up
+docker compose up
 ```
 
 Once the services are running, you can access the Superset web interface at http://localhost:8088.

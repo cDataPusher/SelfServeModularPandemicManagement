@@ -45,17 +45,15 @@ For more detailed information about each component of the system, please refer t
 1. Clone this repository:
 
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/cDataPusher/SelfServeModularPandemicManagement.git
     ```
 
 2. Navigate to the repository directory:
     ```bash
-    cd <repository_directory>
+    cd SelfServeModularPandemicManagement
     ```
 3. Start the services:
-    ```bash
-    docker-compose up
-    ```
+
 Once the services are running, you can access the Superset web interface at http://localhost:8088 and Airflow at http://localhost:8080. The Keycloak admin console is available at http://localhost:8081/auth/admin/.
 
 

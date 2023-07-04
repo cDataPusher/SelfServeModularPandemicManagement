@@ -6,23 +6,18 @@ This repository contains a Docker Compose setup for testing Apache Superset.
 
 Follow these steps to get Apache Superset running on your local machine for development and testing purposes.
 
-### 1. Clone the Repository
 
+### 1. Navigate to the Repository Directory
 ```bash
-git clone <repository_url>
-```
-
-### 2. Navigate to the Repository Directory
-```bash
-cd <repository_directory>
+cd airflow
 ```
 
 
-### 3. Start the Services
+### 2. Start the Services
 ```bash
-docker-compose up
+docker compose up
 ```
-Once the services are running, you can access the Superset web interface at http://localhost:8088.
+Once the services are running, you can access the Airflow web interface at http://localhost:8080.
 
 ## Docker Compose File
 
