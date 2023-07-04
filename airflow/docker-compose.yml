@@ -6,13 +6,15 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-airflow}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
       POSTGRES_DB: ${POSTGRES_DB:-airflow}
+    ports:
+      - 5432:5432
     volumes:
       - postgres-db:/var/lib/postgresql/data
     networks:
       - airflow
 
   webserver:
-    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2.004}
+    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2}
     environment:
       AIRFLOW__CORE__EXECUTOR: CeleryExecutor
       AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-}
@@ -28,7 +30,7 @@ services:
       - postgres
 
   scheduler:
-    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2.004}
+    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2}
     environment:
       AIRFLOW__CORE__EXECUTOR: CeleryExecutor
       AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-}
@@ -42,7 +44,7 @@ services:
       - webserver
 
   worker:
-    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2.004}
+    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2}
     environment:
       AIRFLOW__CORE__EXECUTOR: CeleryExecutor
       AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-}
@@ -58,6 +60,7 @@ services:
 
 volumes:
   postgres-db:
+
 
 networks:
   airflow:
