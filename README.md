@@ -59,4 +59,20 @@ For more detailed information about each component of the system, please refer t
 Once the services are running, you can access the Superset web interface at http://localhost:8088 and Airflow at http://localhost:8080. The Keycloak admin console is available at http://localhost:8081/auth/admin/.
 
 
+## Running the System
+
+Follow these steps to get the system running:
+
+1. **Start Apache Superset**: Navigate to the Superset directory and run the Docker Compose command to start the service. Refer to the [Superset Documentation](./superset/README.md) for detailed steps.
+
+2. **Start Apache Airflow**: Navigate to the Airflow directory and use Docker Compose to start the Airflow services. Detailed steps can be found in the [Airflow Documentation](./airflow/README.md).
+
+3. **Start Keycloak**: Run the Keycloak services using Docker Compose. Follow the instructions in the [Keycloak Documentation](./keycloak/README.md) to add users and set up roles and clients.
+
+4. **Start the RKI-Airflow-DAG**: Access the Airflow web interface, login with the default credentials (`airflow:airflow`), and trigger the RKI-Airflow-DAG.
+
+5. **Import the Dashboard into Superset**: After starting Superset, access the Superset web interface at http://localhost:8088. Log in with the default credentials (`superset:superset`). Navigate to the 'Dashboards' tab and use the 'Import Dashboard' option to import the `dashboard_export` file located in the Superset directory.
+
+Please note that if it's your first time running these services, you might need to go through initial setup processes such as creating admin users or initializing databases.
+
 Ensuring the proper interaction between networks is crucial for successfully initiating the Superset application, followed by Airflow, and finally executing the RKI example DAG.
