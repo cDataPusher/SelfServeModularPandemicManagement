@@ -1,12 +1,34 @@
-# Airflow Docker Compose Setup
+# Apache Superset Testing Setup
 
-This folder contains a Docker Compose file for setting up an Apache Airflow environment for local development and testing. The setup includes a Postgres database, an Airflow webserver, a scheduler, and a worker.
+This repository contains a Docker Compose setup for testing Apache Superset.
+
+## Getting Started
+
+Follow these steps to get Apache Superset running on your local machine for development and testing purposes.
+
+### 1. Clone the Repository
+
+```bash
+git clone <repository_url>
+```
+
+### 2. Navigate to the Repository Directory
+```bash
+cd <repository_directory>
+```
+
+
+### 3. Start the Services
+```bash
+docker-compose up
+```
+Once the services are running, you can access the Superset web interface at http://localhost:8088.
 
 ## Docker Compose File
 
 The `docker-compose.yaml` file defines the services, networks, and volumes for the Airflow setup. Each service uses the Apache Airflow Docker image and has the Airflow DAGs and plugins directories mounted into the container.
 
-## Environment Variables
+## Configuration
 
 The Docker Compose file uses several environment variables to configure the Airflow services. These variables can be set in an `.env` file in the same directory as the Docker Compose file. Here are the variables used:
 
@@ -19,23 +41,25 @@ The Docker Compose file uses several environment variables to configure the Airf
 - `HOST_PROTOCOL`: The protocol for the Airflow webserver's base URL. Default is `http`.
 - `HOST_NAME`: The host name for the Airflow webserver's base URL. Default is `localhost:8080`.
 
-## Usage
 
-To start the Airflow environment, run the following command in the same directory as the Docker Compose file:
+## Keycloak Integration
+Superset can be integrated with Keycloak for authentication. This is disabled by default for testing purposes but can be enabled via the ENABLE_KEYCLOAK environment variable in the superset_config.py file.
 
-```bash
-docker-compose up
+To enable Keycloak integration, set ENABLE_KEYCLOAK to True. Additionally, set the following environment variables in the docker-compose.yml file:
+
+- `KEYCLOAK_BASE_URL`: Your Keycloak base URL.
+- `KEYCLOAK_CLIENT_ID`: Your Keycloak client ID.
+- `KEYCLOAK_CLIENT_SECRET`: Your Keycloak client secret.
+
+The enabling can be done in the superset_config.py:
+```python
+ENABLE_KEYCLOAK = True
 ```
-
-To stop the environment, use the following command:
-
-```bash
-docker-compose down
-```
-
-You can access the Airflow webserver at http://localhost:8080 (or whatever you set as the HOST_NAME and HOST_PROTOCOL).
-
+Make sure Keycloak is running and properly configured before enabling integration in Superset.
 Remember to set your environment variables in the .env file or in your shell before starting the environment.
 
 
+You can add rights for airflow to download data:
+```bash
 docker exec -u 0 airflow_webserver_1 chown -R airflow: /opt/airflow/airflow_dag_data
+```

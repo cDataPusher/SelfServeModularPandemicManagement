@@ -36,8 +36,8 @@ THREADED = True
 ENABLE_KEYCLOAK = os.getenv("ENABLE_KEYCLOAK", "false").lower() == "true"
 
 # Superset secret key
-SECRET_KEY = 'XWfZ8ZJRySSD6wdWAucSMDInV+b4jj9uWu2rR4B/T5lnLLPFLKe6jbw2'
-SUPERSET_SECRET_KEY = 'XWfZ8ZJRySSD6wdWAucSMDInV+b4jj9uWu2rR4B/T5lnLLPFLKe6jbw2'
+SECRET_KEY = os.getenv("SUPERSET_SECRET_KEY")
+SUPERSET_SECRET_KEY = os.getenv("SUPERSET_SECRET_KEY")
 
 if ENABLE_KEYCLOAK:
     # Keycloak configuration
