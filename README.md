@@ -29,7 +29,8 @@ You need to have Docker and Docker Compose installed on your machine.
 ### Component Documentation
 For more detailed information about each component of the system, please refer to the README files in the respective directories:
 
-* [Apache Airflow](./airflow/README.md)
 * [Apache Superset](./superset/README.md)
+* [Apache Airflow](./airflow/README.md)
 * [Keycloak](./keycloak/README.md)
+
 

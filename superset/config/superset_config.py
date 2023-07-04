@@ -24,6 +24,8 @@ SUPERSET_WEBSERVER_WORKERS = 2
 # Superset web server port
 SUPERSET_WEBSERVER_PORT = 8088
 
+TESTING = 1
+
 # Enable / disable scheduled email reports
 ENABLE_SCHEDULED_EMAIL_REPORTS = False
 
@@ -32,6 +34,10 @@ THREADED = True
 
 # Keycloak switch
 ENABLE_KEYCLOAK = os.getenv("ENABLE_KEYCLOAK", "false").lower() == "true"
+
+# Superset secret key
+SECRET_KEY = 'XWfZ8ZJRySSD6wdWAucSMDInV+b4jj9uWu2rR4B/T5lnLLPFLKe6jbw2'
+SUPERSET_SECRET_KEY = 'XWfZ8ZJRySSD6wdWAucSMDInV+b4jj9uWu2rR4B/T5lnLLPFLKe6jbw2'
 
 if ENABLE_KEYCLOAK:
     # Keycloak configuration

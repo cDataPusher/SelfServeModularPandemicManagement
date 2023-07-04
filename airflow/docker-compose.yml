@@ -1,66 +1,81 @@
-version: '3.9'
+version: '3.8'
+
 services:
   postgres:
-    image: postgres:${POSTGRES_VERSION:-13}
+    image: postgres:13
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-airflow}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
-      POSTGRES_DB: ${POSTGRES_DB:-airflow}
-    ports:
-      - 5432:5432
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
     volumes:
-      - postgres-db:/var/lib/postgresql/data
-    networks:
-      - airflow
+      - postgres-data:/var/lib/postgresql/data
 
   webserver:
-    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2}
-    environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-}
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@${POSTGRES_HOST:-postgres}/${POSTGRES_DB:-airflow}
-      AIRFLOW__WEBSERVER__BASE_URL: ${HOST_PROTOCOL:-http}://${HOST_NAME:-localhost:8080}
-      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY:-}
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/plugins:/opt/airflow/plugins
-    networks:
-      - airflow
+    image: apache/airflow:2.6.2
     depends_on:
       - postgres
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__FERNET_KEY=${FERNET_KEY}
+      - AIRFLOW__WEBSERVER__SECRET_KEY=${SECRET_KEY}
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - airflow_dag_data:/opt/airflow/airflow_dag_data
+      - logs:/opt/airflow/logs
+      - ./config/requirements.txt:/requirements.txt
+    ports:
+      - "8080:8080"
+    command: >
+      bash -c "pip install -r /requirements.txt &&
+             airflow db init &&
+              airflow users create --username airflow --password airflow --firstname John --lastname Doe --role Admin --email admin@example.com &&
+              exec airflow webserver"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "[ -f /usr/local/airflow/airflow-webserver.pid ]"
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - default
+      - superset_network
 
   scheduler:
-    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2}
+    image: apache/airflow:2.6.2
+    depends_on:
+      - postgres
     environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-}
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@${POSTGRES_HOST:-postgres}/${POSTGRES_DB:-airflow}
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__FERNET_KEY=${FERNET_KEY}
+      - AIRFLOW__WEBSERVER__SECRET_KEY=${SECRET_KEY}
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
     volumes:
       - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/plugins:/opt/airflow/plugins
+      - airflow_dag_data:/opt/airflow/airflow_dag_data
+      - logs:/opt/airflow/logs
+      - ./config/requirements.txt:/requirements.txt
+    command: >
+      bash -c "pip install -r /requirements.txt && sleep 10 && airflow scheduler"
     networks:
-      - airflow
-    depends_on:
-      - webserver
-
-  worker:
-    image: apache/airflow:${AIRFLOW_VERSION:-2.6.2}
-    environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-}
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@${POSTGRES_HOST:-postgres}/${POSTGRES_DB:-airflow}
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/plugins:/opt/airflow/plugins
-    networks:
-      - airflow
-    depends_on:
-      - webserver
-      - scheduler
+      - default
+      - superset_network
 
 volumes:
-  postgres-db:
+  postgres-data:
+  airflow_dag_data:
+  logs:
 
 
 networks:
-  airflow:
+  superset_network:
+    external: true
+    name: superset_superset_network

@@ -36,3 +36,6 @@ docker-compose down
 You can access the Airflow webserver at http://localhost:8080 (or whatever you set as the HOST_NAME and HOST_PROTOCOL).
 
 Remember to set your environment variables in the .env file or in your shell before starting the environment.
+
+
+docker exec -u 0 airflow_webserver_1 chown -R airflow: /opt/airflow/airflow_dag_data

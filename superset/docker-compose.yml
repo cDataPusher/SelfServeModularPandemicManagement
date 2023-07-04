@@ -1,24 +1,30 @@
-version: "3.8"
+version: '3.7'
+
 services:
   redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
+    image: redis:6-alpine
+    container_name: superset_cache
+    command: redis-server --requirepass your_redis_password
+    networks:
+      - superset_network
 
   db:
-    image: postgres:12.5
+    image: postgres:13
+    container_name: superset_db
+    ports:
+      - 5432:5432
     environment:
-      POSTGRES_DB: superset
       POSTGRES_USER: superset
       POSTGRES_PASSWORD: superset
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: superset
+    volumes:
+      - db_home:/var/lib/postgresql/data
+    networks:
+      - superset_network
 
   superset:
-    image: apache/superset
-    depends_on:
-      - db
-      - redis
+    image: apache/superset:latest
+    container_name: superset_app
     ports:
       - "8088:8088"
     environment:
@@ -29,5 +35,29 @@ services:
       POSTGRES_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      REDIS_PASSWORD: your_redis_password
+      SECRET_KEY: XWfZ8ZJRySSD6wdWAucSMDInV+b4jj9uWu2rR4B/T5lnLLPFLKe6jbw2
+    depends_on:
+      - db
+      - redis
     volumes:
-      - ./config/superset_config.py:/app/superset/superset_config.py
+      - superset_home:/app/superset_home
+      - ./config/superset_config.py:/app/superset_config.py
+    command:
+      [
+        "bash",
+        "-c",
+        "superset db upgrade && superset init && flask fab create-user --role Admin --username superset --firstname superset --lastname superset --email user@example.com --password superset && superset run -h 0.0.0.0 -p 8088 --with-threads --reload "
+      ]
+    networks:
+      - superset_network
+
+volumes:
+  db_home:
+  superset_home:
+
+
+networks:
+  superset_network:
+    #external: true
+    name: superset_network
