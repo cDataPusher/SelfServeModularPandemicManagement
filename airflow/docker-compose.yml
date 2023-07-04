@@ -78,4 +78,4 @@ volumes:
 networks:
   superset_network:
     external: true
-    name: superset_superset_network
+    name: superset_network
